@@ -103,13 +103,13 @@ const appId =
   typeof __app_id !== "undefined" ? __app_id : "working-schedule-app"; // Incremented version
 
 const DAYS_OF_WEEK = [
-  "Thứ 2",
-  "Thứ 3",
-  "Thứ 4",
-  "Thứ 5",
-  "Thứ 6",
-  "Thứ 7",
-  "Chủ Nhật",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
 // Helper function to convert HH:mm to minutes from midnight
@@ -191,8 +191,8 @@ function ConfirmModal({
   onConfirm,
   title,
   message,
-  confirmText = "Xác nhận",
-  cancelText = "Hủy",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
   confirmColor = "bg-red-600 hover:bg-red-700",
   isSubmitting = false, // New prop for loading state
 }) {
@@ -263,7 +263,7 @@ function DeleteConfirmModal({
     if (slotInfo?.isRecurring && deleteMode === "date_range") {
       if (!rangeStart || !rangeEnd) {
         setModalError(
-          "Vui lòng chọn ngày bắt đầu và kết thúc cho khoảng thời gian xóa."
+          "Please select a start and end date for the deletion range."
         );
         return;
       }
@@ -271,7 +271,7 @@ function DeleteConfirmModal({
         parse(rangeStart, "yyyy-MM-dd", new Date()) >
         parse(rangeEnd, "yyyy-MM-dd", new Date())
       ) {
-        setModalError("Ngày bắt đầu không được sau ngày kết thúc.");
+        setModalError("Start date cannot be after end date.");
         return;
       }
     }
@@ -280,10 +280,10 @@ function DeleteConfirmModal({
 
   if (!isOpen || !slotInfo) return null;
 
-  const title = "Xác nhận xóa tiết học";
-  let message = `Bạn có chắc chắn muốn xóa tiết học "${slotInfo.className}"?`;
+  const title = "Confirm Delete Class";
+  let message = `Are you sure you want to delete the class "${slotInfo.className}"?`;
   if (slotInfo.isRecurring) {
-    message = `Chọn cách xóa cho tiết học lặp lại "${slotInfo.className}":`;
+    message = `Select how to delete the recurring class "${slotInfo.className}":`;
   }
 
   return (
@@ -309,7 +309,7 @@ function DeleteConfirmModal({
               disabled={isDeleting}
             >
               <option value="current_instance">
-                Chỉ lần này (ngày{" "}
+                Only this instance (on{" "}
                 {format(
                   addDays(currentWeekStart, slotInfo.dayOfWeek - 1),
                   "dd/MM/yyyy"
@@ -317,16 +317,16 @@ function DeleteConfirmModal({
                 )
               </option>
               <option value="from_now_on">
-                Từ tuần này ({format(currentWeekStart, "dd/MM/yyyy")}) trở về
-                sau
+                From this week ({format(currentWeekStart, "dd/MM/yyyy")})
+                onwards
               </option>
-              <option value="date_range">Trong khoảng thời gian...</option>
-              <option value="all">Toàn bộ chuỗi tiết học này</option>
+              <option value="date_range">Within a date range...</option>
+              <option value="all">Entire series of this class</option>
             </select>
             {deleteMode === "date_range" && (
               <div className="grid grid-cols-2 gap-3 mt-2">
                 <div>
-                  <label className="text-xs text-gray-600">Từ ngày:</label>
+                  <label className="text-xs text-gray-600">Start Date:</label>
                   <input
                     type="date"
                     value={rangeStart}
@@ -336,7 +336,7 @@ function DeleteConfirmModal({
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-600">Đến ngày:</label>
+                  <label className="text-xs text-gray-600">End Date:</label>
                   <input
                     type="date"
                     value={rangeEnd}
@@ -356,7 +356,7 @@ function DeleteConfirmModal({
             disabled={isDeleting}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50"
           >
-            Hủy
+            Cancel
           </button>
           <button
             onClick={handleConfirm}
@@ -364,7 +364,7 @@ function DeleteConfirmModal({
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 flex items-center justify-center"
           >
             {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Xác nhận Xóa
+            Confirm Delete
           </button>
         </div>
       </div>
@@ -462,19 +462,17 @@ function SlotModal({
     setFormError("");
 
     if (!className || !startTime || !endTime) {
-      setFormError(
-        "Vui lòng nhập Tên lớp, Thời gian bắt đầu và Thời gian kết thúc."
-      );
+      setFormError("Please enter Class Name, Start Time, and End Time.");
       return;
     }
     if (timeToMinutes(startTime) >= timeToMinutes(endTime)) {
-      setFormError("Thời gian kết thúc phải sau thời gian bắt đầu.");
+      setFormError("End Time must be after Start Time.");
       return;
     }
 
     const salaryNumber = salary ? parseFloat(salary) : 0;
     if (salary && (isNaN(salaryNumber) || salaryNumber < 0)) {
-      setFormError("Tiền lương phải là một số không âm.");
+      setFormError("Salary must be a non-negative number.");
       return;
     }
 
@@ -516,7 +514,7 @@ function SlotModal({
         } else if (finalApplyMode === "date_range") {
           if (!rangeStartDate || !rangeEndDate) {
             setFormError(
-              "Vui lòng chọn ngày bắt đầu và kết thúc cho phạm vi áp dụng."
+              "Please select a start and end date for the apply range."
             );
             return;
           }
@@ -525,7 +523,7 @@ function SlotModal({
             parse(rangeEndDate, "yyyy-MM-dd", new Date())
           ) {
             setFormError(
-              "Ngày bắt đầu của phạm vi không được sau ngày kết thúc."
+              "Start date of the range cannot be after the end date."
             );
             return;
           }
@@ -534,7 +532,7 @@ function SlotModal({
         }
       } else {
         if (!specificDate) {
-          setFormError("Vui lòng chọn ngày cụ thể cho tiết học một lần.");
+          setFormError("Please select a specific date for the one-time class.");
           return;
         }
         slotData.specificDate = specificDate;
@@ -546,7 +544,7 @@ function SlotModal({
   };
 
   if (!isOpen) return null;
-  const title = slot && slot.id ? "Chỉnh sửa tiết học" : "Thêm tiết học mới";
+  const title = slot && slot.id ? "Edit Class" : "Add New Class";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -574,7 +572,7 @@ function SlotModal({
                 htmlFor="className"
                 className="block text-sm font-medium text-gray-700"
               >
-                Tên lớp
+                Class Name
               </label>
               <input
                 type="text"
@@ -591,7 +589,7 @@ function SlotModal({
                   htmlFor="startTime"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Thời gian bắt đầu
+                  Start Time
                 </label>
                 <input
                   type="time"
@@ -607,7 +605,7 @@ function SlotModal({
                   htmlFor="endTime"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Thời gian kết thúc
+                  End Time
                 </label>
                 <input
                   type="time"
@@ -624,7 +622,7 @@ function SlotModal({
                 htmlFor="location"
                 className="block text-sm font-medium text-gray-700"
               >
-                Địa điểm (nếu có)
+                Location (if any)
               </label>
               <input
                 type="text"
@@ -639,7 +637,7 @@ function SlotModal({
                 htmlFor="salary"
                 className="block text-sm font-medium text-gray-700"
               >
-                Tiền lương (VNĐ)
+                Salary (VNĐ)
               </label>
               <input
                 type="number"
@@ -647,7 +645,7 @@ function SlotModal({
                 value={salary}
                 onChange={(e) => setSalary(e.target.value)}
                 min="0"
-                placeholder="Để trống nếu không có"
+                placeholder="Leave blank if none"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:bg-gray-100"
               />
             </div>
@@ -656,7 +654,7 @@ function SlotModal({
                 htmlFor="note"
                 className="block text-sm font-medium text-gray-700"
               >
-                Ghi chú
+                Note
               </label>
               <textarea
                 id="note"
@@ -664,12 +662,12 @@ function SlotModal({
                 onChange={(e) => setNote(e.target.value)}
                 rows="2"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:bg-gray-100"
-                placeholder="Thêm ghi chú cho tiết học..."
+                placeholder="Add a note for the class..."
               ></textarea>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Tính chất tiết dạy
+                Class Type
               </label>
               <div className="mt-1 flex rounded-md shadow-sm">
                 <button
@@ -681,7 +679,7 @@ function SlotModal({
                       : "bg-white text-gray-700 hover:bg-gray-50"
                   } focus:outline-none w-1/2 disabled:bg-gray-100 disabled:text-gray-400`}
                 >
-                  Lặp lại
+                  Recurring
                 </button>
                 <button
                   type="button"
@@ -692,7 +690,7 @@ function SlotModal({
                       : "bg-white text-gray-700 hover:bg-gray-50"
                   } focus:outline-none w-1/2 disabled:bg-gray-100 disabled:text-gray-400`}
                 >
-                  1 lần
+                  One-time
                 </button>
               </div>
             </div>
@@ -702,7 +700,7 @@ function SlotModal({
                   htmlFor="dayOfWeek"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ngày trong tuần
+                  Day of Week
                 </label>
                 <select
                   id="dayOfWeek"
@@ -723,7 +721,7 @@ function SlotModal({
                   htmlFor="specificDate"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ngày cụ thể
+                  Specific Date
                 </label>
                 <input
                   type="date"
@@ -738,7 +736,7 @@ function SlotModal({
             {(!slot || !slot.id) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Chế độ áp dụng (khi tạo mới)
+                  Apply Mode (when creating new)
                 </label>
                 <select
                   value={applyMode}
@@ -748,18 +746,18 @@ function SlotModal({
                   {isRecurringNature ? (
                     <>
                       <option value="current_week_recurring">
-                        Lặp lại từ tuần này (mặc định)
+                        Recurring from this week (default)
                       </option>
                       <option value="all_weeks_recurring">
-                        Lặp lại vô hạn (không ngày kết thúc)
+                        Recurring indefinitely (no end date)
                       </option>
                       <option value="date_range">
-                        Lặp lại trong khoảng thời gian
+                        Recurring within a date range
                       </option>
                     </>
                   ) : (
                     <option value="current_week_onetime">
-                      Chỉ trong tuần này (1 lần)
+                      Only in this week (one-time)
                     </option>
                   )}
                 </select>
@@ -770,7 +768,7 @@ function SlotModal({
                         htmlFor="rangeStartDate"
                         className="block text-xs font-medium text-gray-700"
                       >
-                        Từ ngày
+                        From Date
                       </label>
                       <input
                         type="date"
@@ -785,7 +783,7 @@ function SlotModal({
                         htmlFor="rangeEndDate"
                         className="block text-xs font-medium text-gray-700"
                       >
-                        Đến ngày
+                        To Date
                       </label>
                       <input
                         type="date"
@@ -807,7 +805,7 @@ function SlotModal({
               disabled={isSavingSlot}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
@@ -818,7 +816,7 @@ function SlotModal({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               <Save size={18} className={isSavingSlot ? "" : "mr-2"} />{" "}
-              {isSavingSlot ? "Đang lưu..." : "Lưu"}
+              {isSavingSlot ? "Saving..." : "Save"}
             </button>
           </div>
         </form>
@@ -1018,21 +1016,21 @@ function ScheduleTable({
   if (minimalTimeIntervals.length === 0 && activeSlotsForWeek.length > 0) {
     return (
       <div className="p-4 text-center text-gray-500">
-        Không có tiết học nào được lên lịch hoặc không thể tạo khung giờ động.
+        No classes are scheduled or dynamic time slots could not be created.
       </div>
     );
   }
   if (activeSlotsForWeek.length === 0 && slots.length > 0) {
     return (
       <div className="p-4 text-center text-gray-500">
-        Không có tiết học nào được lên lịch cho tuần này.
+        No classes are scheduled for this week.
       </div>
     );
   }
   if (slots.length === 0) {
     return (
       <div className="p-4 text-center text-gray-500">
-        Chưa có tiết học nào được tạo. Hãy thêm tiết học mới!
+        No classes have been created yet. Add a new class!
       </div>
     );
   }
@@ -1043,7 +1041,7 @@ function ScheduleTable({
         <thead className="bg-gray-50">
           <tr>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28 sticky left-0 bg-gray-50 z-10 border border-gray-300">
-              Thời gian
+              Time
             </th>
             {daysInView.map((day) => (
               <th
@@ -1107,21 +1105,21 @@ function ScheduleTable({
                             <div className="absolute top-0.5 right-0.5 flex space-x-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => onDuplicateSlot(slot)}
-                                title="Nhân bản"
+                                title="Duplicate"
                                 className="p-0.5 bg-white/70 hover:bg-white rounded-full text-green-600"
                               >
                                 <Copy size={10} />
                               </button>
                               <button
                                 onClick={() => onEditSlot(slot)}
-                                title="Sửa"
+                                title="Edit"
                                 className="p-0.5 bg-white/70 hover:bg-white rounded-full text-blue-600"
                               >
                                 <Edit3 size={10} />
                               </button>
                               <button
                                 onClick={() => onDeleteSlotPrompt(slot)}
-                                title="Xóa"
+                                title="Delete"
                                 className="p-0.5 bg-white/70 hover:bg-white rounded-full text-red-600"
                               >
                                 <Trash2 size={10} />
@@ -1206,7 +1204,7 @@ function RevenueStats({ slots, currentWeekStart }) {
         newChartData = daysInWeek.map((day) => {
           const revenue = getRevenueForDate(day);
           currentTotalRevenue += revenue;
-          return { name: format(day, "E dd/MM", { locale: vi }), revenue };
+          return { name: format(day, "E dd/MM"), revenue };
         });
         break;
       case "month":
@@ -1226,8 +1224,12 @@ function RevenueStats({ slots, currentWeekStart }) {
             }
           );
           currentTotalRevenue += weeklyRevenue;
+          // Modify the name to include the date range
+          const weekStartDate = format(weekStart, "dd/MM", { locale: vi });
+          const weekEndDate = format(weekActualEnd, "dd/MM", { locale: vi });
+          const weekRangeName = `Tuần (${weekStartDate} - ${weekEndDate})`;
           return {
-            name: `Tuần ${getISOWeek(weekStart)}`,
+            name: weekRangeName,
             revenue: weeklyRevenue,
           };
         });
@@ -1289,16 +1291,16 @@ function RevenueStats({ slots, currentWeekStart }) {
     const refDate = referenceDateForStats;
     switch (period) {
       case "week":
-        return `Tuần (${format(
+        return `Week (${format(
           startOfWeek(refDate, { weekStartsOn: 1 }),
           "dd/MM"
         )} - ${format(endOfWeek(refDate, { weekStartsOn: 1 }), "dd/MM")})`;
       case "month":
-        return `Tháng ${format(refDate, "MM/yyyy", { locale: vi })}`;
+        return `Month ${format(refDate, "MM/yyyy", { locale: vi })}`;
       case "quarter":
-        return `Quý ${getQuarter(refDate)}/${getYear(refDate)}`;
+        return `Quarter ${getQuarter(refDate)}/${getYear(refDate)}`;
       case "year":
-        return `Năm ${getYear(refDate)}`;
+        return `Year ${getYear(refDate)}`;
       default:
         return "";
     }
@@ -1308,7 +1310,7 @@ function RevenueStats({ slots, currentWeekStart }) {
     <div className="mt-6 p-4 bg-white shadow-md rounded-lg">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-xl font-semibold text-gray-800">
-          Thống kê doanh thu
+          Revenue Statistics
         </h3>
         <BarChart3 size={24} className="text-indigo-600" />
       </div>
@@ -1317,7 +1319,7 @@ function RevenueStats({ slots, currentWeekStart }) {
           htmlFor="statsPeriod"
           className="text-sm font-medium text-gray-700"
         >
-          Xem theo:
+          View by:
         </label>
         <select
           id="statsPeriod"
@@ -1326,7 +1328,7 @@ function RevenueStats({ slots, currentWeekStart }) {
           className="px-3 py-1.5 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
           <option value="week">
-            Tuần (
+            Week (
             {format(
               startOfWeek(referenceDateForStats, { weekStartsOn: 1 }),
               "dd/MM"
@@ -1339,17 +1341,17 @@ function RevenueStats({ slots, currentWeekStart }) {
             )
           </option>
           <option value="month">
-            Tháng ({format(referenceDateForStats, "MM/yyyy", { locale: vi })})
+            Month ({format(referenceDateForStats, "MM/yyyy", { locale: vi })})
           </option>
           <option value="quarter">
-            Quý (Q{getQuarter(referenceDateForStats)}/
+            Quarter (Q{getQuarter(referenceDateForStats)}/
             {getYear(referenceDateForStats)})
           </option>
-          <option value="year">Năm ({getYear(referenceDateForStats)})</option>
+          <option value="year">Year ({getYear(referenceDateForStats)})</option>
         </select>
       </div>
       <p className="text-2xl font-bold text-indigo-600 mb-1">
-        Tổng doanh thu ({getPeriodLabel()}):
+        Total Revenue ({getPeriodLabel()}):
       </p>
       <p className="text-2xl font-bold text-indigo-600 mb-4">
         {new Intl.NumberFormat("vi-VN", {
@@ -1584,21 +1586,27 @@ export default function App() {
 
   const handleRequestNotificationPermission = () => {
     if (typeof Notification === "undefined") {
-      displayGlobalMessage("error", "Trình duyệt này không hỗ trợ thông báo.");
+      displayGlobalMessage(
+        "error",
+        "This browser does not support notifications."
+      );
       setShowNotificationPermissionModal(false);
       return;
     }
     Notification.requestPermission().then((permission) => {
       if (permission === "granted") {
         try {
-          new Notification("Thông báo đã được bật!", {
-            body: "Bạn sẽ nhận được thông báo cho các tiết học sắp tới.",
+          new Notification("Notifications enabled!", {
+            body: "You will receive notifications for upcoming classes.",
           });
         } catch (e) {
           console.error("Error showing permission granted notification:", e);
         }
       } else {
-        displayGlobalMessage("warn", "Bạn đã không cấp quyền thông báo.");
+        displayGlobalMessage(
+          "warn",
+          "You have not granted notification permissions."
+        );
       }
       setShowNotificationPermissionModal(false);
     });
@@ -1902,21 +1910,20 @@ export default function App() {
   if (isLoading && !error && isAuthReady && !userId)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
-        Đang xác thực người dùng...
+        Authenticating user...
       </div>
     );
   if (isLoading && !error)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
-        Đang tải dữ liệu lịch làm việc...
+        Loading schedule data...
       </div>
     );
   if (error)
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-red-100 text-red-700 p-4 text-center">
-        {" "}
-        <AlertTriangle size={48} className="mb-4 text-red-500" />{" "}
-        <p className="text-xl font-semibold">Đã xảy ra lỗi</p>{" "}
+        <AlertTriangle size={48} className="mb-4 text-red-500" />
+        <p className="text-xl font-semibold">An error occurred</p>
         <p className="mb-4">{error}</p>{" "}
         <button
           onClick={() => {
@@ -1924,7 +1931,7 @@ export default function App() {
             setIsLoading(true);
             if (!auth?.currentUser) {
               signInAnonymously(authGlobal).catch((e) => {
-                setError("Lỗi đăng nhập lại: " + e.message);
+                setError("Relogin error: " + e.message);
                 setIsLoading(false);
               });
             } else {
@@ -1934,15 +1941,14 @@ export default function App() {
           }}
           className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
-          {" "}
-          Thử lại{" "}
-        </button>{" "}
+          Try again
+        </button>
       </div>
     );
   if (!isAuthReady || !userId)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
-        Đang khởi tạo ứng dụng...
+        Initializing application...
       </div>
     );
 
@@ -1979,7 +1985,7 @@ export default function App() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl md:text-4xl font-bold text-indigo-700">
             {" "}
-            Lịch Làm Việc Tuần{" "}
+            Weekly Schedule{" "}
           </h1>
           {/* Logout button removed */}
         </div>
@@ -1989,14 +1995,14 @@ export default function App() {
           !showNotificationPermissionModal && (
             <div className="mt-2 p-3 bg-yellow-100 border border-yellow-300 rounded-md text-yellow-700 text-sm">
               {" "}
-              Ứng dụng muốn gửi thông báo nhắc nhở tiết học.{" "}
+              The application wants to send you class reminder notifications.{" "}
               <button
                 onClick={() => setShowNotificationPermissionModal(true)}
                 className="ml-2 font-semibold underline hover:text-yellow-800"
               >
                 {" "}
-                Xem chi tiết & Cho phép{" "}
-              </button>{" "}
+                View details & Allow{" "}
+              </button>
             </div>
           )}
       </header>
@@ -2015,7 +2021,7 @@ export default function App() {
             className="px-4 py-2 rounded-md bg-white hover:bg-gray-200 shadow text-indigo-600 text-sm font-medium"
           >
             {" "}
-            Hôm nay{" "}
+            Today{" "}
           </button>
           <button
             onClick={handleNextWeek}
@@ -2026,7 +2032,7 @@ export default function App() {
           </button>
           <h2 className="text-xl font-semibold text-gray-700 ml-2 hidden md:block">
             {" "}
-            Tuần từ{" "}
+            Week from{" "}
             {format(currentWeekStart, "dd/MM/yyyy", {
               locale: vi,
             })}{" "}
@@ -2051,7 +2057,7 @@ export default function App() {
               className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md transition duration-150 text-sm"
             >
               {" "}
-              <FileUp size={18} className="mr-2" /> Nhập JSON{" "}
+              <FileUp size={18} className="mr-2" /> Import Config{" "}
             </button>{" "}
           </div>
           <div className="relative">
@@ -2061,7 +2067,7 @@ export default function App() {
               className="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md shadow-md transition duration-150 text-sm"
             >
               {" "}
-              <FileDown size={18} className="mr-2" /> Xuất JSON{" "}
+              <FileDown size={18} className="mr-2" /> Export Config{" "}
             </button>{" "}
           </div>
           <button
@@ -2069,13 +2075,13 @@ export default function App() {
             className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow-md transition duration-150 text-sm"
           >
             {" "}
-            <PlusCircle size={18} className="mr-2" /> Thêm tiết học{" "}
+            <PlusCircle size={18} className="mr-2" /> Add Class{" "}
           </button>
         </div>
       </div>
       <h2 className="text-xl font-semibold text-gray-700 mb-4 md:hidden text-center">
         {" "}
-        Tuần: {format(currentWeekStart, "dd/MM")} -{" "}
+        Week: {format(currentWeekStart, "dd/MM")} -{" "}
         {format(addDays(currentWeekStart, 6), "dd/MM")}{" "}
       </h2>
 
@@ -2112,46 +2118,40 @@ export default function App() {
           setParsedJsonDataForImport(null);
         }}
         onConfirm={executeImportSchedule}
-        title="Xác nhận Nhập Lịch"
-        message="Bạn có chắc chắn muốn nhập lịch từ file JSON này không? Toàn bộ lịch làm việc hiện tại sẽ bị xóa và thay thế."
-        confirmText="Nhập"
+        title="Confirm Import Schedule"
+        message="Are you sure you want to import schedule from this JSON file? All current schedule data will be deleted and replaced."
+        confirmText="Import"
         confirmColor="bg-blue-600 hover:bg-blue-700"
         isSubmitting={isImporting}
       />
       {showNotificationPermissionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[70]">
-          {" "}
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            {" "}
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              {" "}
-              Cho phép gửi thông báo?{" "}
-            </h3>{" "}
+              Allow Notifications?
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
-              {" "}
-              Ứng dụng muốn gửi thông báo để nhắc bạn về các tiết học sắp tới.
-              Bạn có thể thay đổi cài đặt này trong trình duyệt bất cứ lúc nào.{" "}
-            </p>{" "}
+              The application wants to send you notifications to remind you of
+              upcoming classes. You can change this setting in your browser at
+              any time.
+            </p>
             <div className="flex justify-end space-x-3">
-              {" "}
               <button
                 onClick={() => {
                   setShowNotificationPermissionModal(false);
                 }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
               >
-                {" "}
-                Để sau{" "}
-              </button>{" "}
+                Later
+              </button>
               <button
                 onClick={handleRequestNotificationPermission}
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
               >
-                {" "}
-                Cho phép{" "}
-              </button>{" "}
-            </div>{" "}
-          </div>{" "}
+                Allow
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
