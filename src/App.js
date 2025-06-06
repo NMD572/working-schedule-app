@@ -1989,7 +1989,7 @@ export default function App() {
           </h1>
           {/* Logout button removed */}
         </div>
-        <p className="text-sm text-gray-600">UID: {userId}</p>
+        {/* <p className="text-sm text-gray-600">UID: {userId}</p> */}
         {typeof Notification !== "undefined" &&
           Notification.permission === "default" &&
           !showNotificationPermissionModal && (
