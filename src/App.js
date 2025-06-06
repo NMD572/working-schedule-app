@@ -1564,9 +1564,9 @@ export default function App() {
             const notifiedKey = `notified_${slot.id}_${formattedToday}`;
             if (!localStorage.getItem(notifiedKey)) {
               try {
-                new Notification(`Sắp đến giờ học: ${slot.className}`, {
-                  body: `Lớp ${slot.className} bắt đầu lúc ${slot.startTime}${
-                    slot.location ? ` tại ${slot.location}` : ""
+                new Notification(`Upcoming class: ${slot.className}`, {
+                  body: `Class ${slot.className} starts at ${slot.startTime}${
+                    slot.location ? ` at ${slot.location}` : ""
                   }.`,
                   tag: slot.id,
                 });
